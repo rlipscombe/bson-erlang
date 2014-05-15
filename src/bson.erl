@@ -5,6 +5,7 @@
 -export_type ([document/0, label/0, value/0]).
 -export_type ([arr/0]).
 -export_type ([bin/0, bfunction/0, uuid/0, md5/0, userdefined/0]).
+-export_type ([floating_point/0]).
 -export_type ([mongostamp/0, minmaxkey/0]).
 -export_type ([utf8/0, regex/0, unixtime/0]).
 -export_type ([javascript/0]).
@@ -157,7 +158,7 @@ append (Doc1, Doc2) -> list_to_tuple (tuple_to_list (Doc1) ++ tuple_to_list (Doc
 % Value %
 
 -type value() ::
-	float() |
+	floating_point() |
 	utf8() |
 	document() |
 	arr() |
@@ -176,6 +177,10 @@ append (Doc1, Doc2) -> list_to_tuple (tuple_to_list (Doc1) ++ tuple_to_list (Doc
 	integer() |
 	mongostamp() |
 	minmaxkey().
+
+-type floating_point() ::
+	float() |
+	{float, nan, binary()}.
 
 % Note, No value() can be a tuple with even number of elements because then it would be ambiguous with document(). Therefore all tagged values defined below have odd number of elements.
 

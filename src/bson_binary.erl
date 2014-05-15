@@ -21,6 +21,7 @@ put_field (Name, Value) -> case Value of
 	'MAX_KEY' -> <<?put_tagname (127)>>;
 	{Oid} -> <<?put_tagname (7), (put_oid (Oid)) /binary>>;
 	{bin, BinType, Bin} -> <<?put_tagname (5), (put_binary (BinType, Bin)) /binary>>;
+	{float, _, Bin} -> <<?put_tagname (1), Bin/binary>>;
 	{regex, Pat, Opt} -> <<?put_tagname (11), (put_cstring (Pat)) /binary, (put_cstring (Opt)) /binary>>;
 	{javascript, Doc, Code} -> case Doc of
 		{} -> <<?put_tagname (13), (put_string (Code)) /binary>>;
@@ -43,7 +44,7 @@ put_field (Name, Value) -> case Value of
 get_field (<<Tag:8, Bin0/binary>>) ->
 	{Name, Bin1} = get_cstring (Bin0),
 	{Value, BinRest} = case Tag of
-		1 -> <<?get_float (N), Bin2 /binary>> = Bin1, {N, Bin2};
+		1 -> get_float (Bin1);
 		2 -> get_string (Bin1);
 		3 -> get_document (Bin1);
 		4 -> get_array (Bin1);
@@ -66,6 +67,19 @@ get_field (<<Tag:8, Bin0/binary>>) ->
 		127 -> {'MAX_KEY', Bin1};
 		_ -> erlang:error (unknown_bson_tag, [<<Tag:8, Bin0/binary>>]) end,
 	{Name, Value, BinRest}.
+
+-spec get_float (binary()) -> {bson:floating_point(), binary()}.
+get_float(<<?get_float (N), Bin2 /binary>>) ->
+	{N, Bin2};
+get_float(<<N:8 /binary, Bin2 /binary>>) ->
+	get_special_float(N, Bin2).
+
+get_special_float(<<0,0,0,0,0,0,240,255>> = N, Bin2) ->
+	{{float, minus_inf, N}, Bin2};
+get_special_float(<<0,0,0,0,0,0,240,127>> = N, Bin2) ->
+	{{float, plus_inf, N}, Bin2};
+get_special_float(N, Bin2) ->
+	{{float, nan, N}, Bin2}.
 
 -spec put_string (bson:utf8()) -> binary().
 put_string (UBin) -> <<?put_int32 (byte_size (UBin) + 1), UBin /binary, 0:8>>.

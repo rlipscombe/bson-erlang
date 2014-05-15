@@ -68,3 +68,66 @@ binary_test() ->
 			s2, 'MAX_KEY'},
 	Bin1 = bson_binary:put_document (Doc1),
 	{Doc1, <<>>} = bson_binary:get_document (Bin1).
+
+get_floating_point_test() ->
+    Bin = <<19,0,0,0,
+            1,
+            116,101,109,112,0,
+            0,0,0,224,16,39,45,64,
+            0>>,
+    Expected = {temp,14.576300621032715},
+    {Expected, <<>>} = bson_binary:get_document(Bin).
+
+get_floating_point_plus_inf_test() ->
+    Bin = <<19,0,0,0,
+            1,
+            116,101,109,112,0,
+            0,0,0,0,0,0,240,127,
+            0>>,
+    Doc = {temp, {float, plus_inf, <<0,0,0,0,0,0,240,127>>}},
+    {Doc, <<>>} = bson_binary:get_document(Bin).
+
+put_floating_point_plus_inf_test() ->
+    Bin = <<19,0,0,0,
+            1,
+            116,101,109,112,0,
+            0,0,0,0,0,0,240,127,
+            0>>,
+    Doc = {temp, {float, plus_inf, <<0,0,0,0,0,0,240,127>>}},
+    Bin = bson_binary:put_document(Doc).
+
+get_floating_point_minus_inf_test() ->
+    Bin = <<19,0,0,0,
+            1,
+            116,101,109,112,0,
+            0,0,0,0,0,0,240,255,
+            0>>,
+    Doc = {temp, {float, minus_inf, <<0,0,0,0,0,0,240,255>>}},
+    {Doc, <<>>} = bson_binary:get_document(Bin).
+
+put_floating_point_minus_inf_test() ->
+    Bin = <<19,0,0,0,
+            1,
+            116,101,109,112,0,
+            0,0,0,0,0,0,240,255,
+            0>>,
+    Doc = {temp, {float, minus_inf, <<0,0,0,0,0,0,240,255>>}},
+    Bin = bson_binary:put_document(Doc).
+
+get_floating_point_nan_test() ->
+    Bin = <<19,0,0,0,
+            1,
+            116,101,109,112,0,
+            0,0,0,0,0,0,248,127,
+            0>>,
+    Doc = {temp, {float, nan, <<0,0,0,0,0,0,248,127>>}},
+    {Doc, <<>>} = bson_binary:get_document(Bin).
+
+put_floating_point_nan_test() ->
+    Bin = <<19,0,0,0,
+            1,
+            116,101,109,112,0,
+            0,0,0,0,0,0,128,127,
+            0>>,
+    Doc = {temp,{float, nan, <<0,0,0,0,0,0,128,127>>}},
+    Bin = bson_binary:put_document(Doc).
