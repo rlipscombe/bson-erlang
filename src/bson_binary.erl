@@ -59,7 +59,7 @@ get_field (<<Tag:8, Bin0/binary>>) ->
 			{{regex, Pat, Opt}, Bin3};
 		13 -> {Code, Bin2} = get_string (Bin1), {{javascript, {}, Code}, Bin2};
 		15 -> {Code, Env, Bin2} = get_closure (Bin1), {{javascript, Env, Code}, Bin2};
-		14 -> {UBin, Bin2} = get_string (Bin1), {binary_to_atom (UBin, utf8), Bin2};
+		14 -> {UBin, Bin2} = get_string (Bin1), {UBin, Bin2};
 		16 -> <<?get_int32 (N), Bin2 /binary>> = Bin1, {N, Bin2};
 		18 -> <<?get_int64 (N), Bin2 /binary>> = Bin1, {N, Bin2};
 		17 -> <<?get_int32 (Inc), ?get_int32 (Tim), Bin2 /binary>> = Bin1, {{mongostamp, Inc, Tim}, Bin2};
@@ -118,7 +118,7 @@ get_document (<<?get_int32 (N), Bin /binary>>) ->
 get_fields (<<>>) -> [];
 get_fields (Bin) ->
 	{Name, Value, Bin1} = get_field (Bin),
-	[binary_to_atom (Name, utf8), Value | get_fields (Bin1)].
+	[Name, Value | get_fields (Bin1)].
 
 -spec put_array (bson:arr()) -> binary().
 % encoded same as document with labels '0', '1', etc.

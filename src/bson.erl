@@ -64,8 +64,10 @@ flatten ([{Label, Value} | Fields]) -> [Label, Value | flatten (Fields)].
 
 -spec lookup (label(), document()) -> maybe (value()).
 %@doc Value of field in document if there
+lookup (Label, Doc) when is_atom(Label) ->
+    lookup(atom_to_binary(Label, utf8), Doc);
 lookup (Label, Doc) ->
-	Parts = string:tokens (atom_to_list (Label), "."),
+	Parts = string:tokens (binary_to_list (Label), "."),
 	case length (Parts) of
 		1 ->
 			case find (list_to_atom (hd (Parts)), Doc) of
@@ -79,8 +81,10 @@ lookup (Label, Doc) ->
 
 -spec lookup (label(), document(), value()) -> value().
 %@doc Value of field in document if there or default
+lookup (Label, Doc, Default) when is_atom(Label) ->
+    lookup(atom_to_binary(Label, utf8), Doc, Default);
 lookup (Label, Doc, Default) ->
-    Parts = string:tokens (atom_to_list (Label), "."),
+    Parts = string:tokens (binary_to_list (Label), "."),
 	case length (Parts) of
 		1 ->
 			case find (list_to_atom (hd (Parts)), Doc) of
@@ -94,10 +98,14 @@ lookup (Label, Doc, Default) ->
 
 -spec find (label(), document()) -> maybe (integer()).
 %@doc Index of field in document if there
+find (Label, Doc) when is_atom(Label) ->
+    find(atom_to_binary(Label, utf8), Doc);
 find (Label, Doc) -> findN (Label, Doc, 0, tuple_size (Doc) div 2).
 
 -spec findN (label(), document(), integer(), integer()) -> maybe (integer()).
 %@doc Find field index in document from first index (inclusive) to second index (exclusive).
+findN (Label, Doc, Low, High) when is_atom(Label) ->
+    findN(atom_to_binary(Label, utf8), Doc, Low, High);
 findN (_Label, _Doc, High, High) -> {};
 findN (Label, Doc, Low, High) -> case element (Low * 2 + 1, Doc) of
 	Label -> {Low};
@@ -105,6 +113,8 @@ findN (Label, Doc, Low, High) -> case element (Low * 2 + 1, Doc) of
 
 -spec at (label(), document()) -> value().
 %@doc Value of field in document, error if missing
+at (Label, Document) when is_atom(Label) ->
+    at(atom_to_binary(Label, utf8), Document);
 at (Label, Document) -> case lookup (Label, Document) of
 	% {} -> erlang:error (missing_field, [Label, Document]);
 	{} -> null;
