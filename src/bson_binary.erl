@@ -159,8 +159,7 @@ put_closure (Code, Env) ->
 	<<?put_int32 (byte_size (Bin) + 4), Bin /binary>>.
 
 -spec get_closure (binary()) -> {bson:utf8(), bson:document(), binary()}.
-get_closure (<<?get_int32 (N), Bin /binary>>) ->
-	_Size = N - 4,
+get_closure (<<?get_int32 (_), Bin /binary>>) ->
 	{Code, Bin1} = get_string (Bin),
 	{Env, Bin2} = get_document (Bin1),
 	{Code, Env, Bin2}.
