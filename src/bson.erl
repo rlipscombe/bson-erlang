@@ -25,7 +25,7 @@
 % Conceptually a document is a list of label-value pairs (associative array, dictionary, record). However, for read/write-ability, it is implemented as a flat tuple, ie. the list becomes a tuple and the pair braces are elided, so you just have alternating labels and values where each value is associated with the previous label.
 % To distinguish a tagged value such as {uuid, _} (see value() type below) from a document with field name 'uuid' we made sure all valid tagged value types have an odd number of elements (documents have even number of elements). So actually only {bin, uuid, _} is a valid value, {uuid, _} is a document.
 
--type label() :: atom().
+-type label() :: atom() | binary().
 
 -spec doc_foldl (fun ((label(), value(), A) -> A), A, document()) -> A.
 %@doc Reduce document by applying given function to each field with result of previous field's application, starting with given initial result.
